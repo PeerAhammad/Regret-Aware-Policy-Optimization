@@ -31,12 +31,19 @@ if "baseline" in results and "rapo" in results:
     base_auc, rapo_auc = base_auc[valid], rapo_auc[valid]
 
     print("\n========== RAPO vs. Stationary: paired test on AUC-R (cumulative harm) ==========")
-    diff = base_auc - rapo_auc
-    reduction_pct = diff / np.maximum(base_auc, 1e-9) * 100
-    print(f"n = {len(diff)}")
-    print(f"Mean harm reduction: {reduction_pct.mean():.2f}% +/- {reduction_pct.std(ddof=1):.2f}%")
-    sem = stats.sem(reduction_pct)
-    margin = stats.t.ppf(0.975, len(reduction_pct) - 1) * sem
-    print(f"95% CI: {reduction_pct.mean() - margin:.2f}% - {reduction_pct.mean() + margin:.2f}%")
+    print(f"n = {len(base_auc)}")
+    print(f"baseline AUC-R: {base_auc.mean():.3f} +/- {base_auc.std(ddof=1):.3f}")
+    print(f"rapo AUC-R:     {rapo_auc.mean():.3f} +/- {rapo_auc.std(ddof=1):.3f}")
+    # Reduction % from aggregate means, NOT a per-seed ratio averaged
+    # afterward -- a per-seed version of this (diff/base_auc per seed,
+    # then mean) is numerically unstable: any single seed with a
+    # near-zero baseline AUC-R blows up that seed's ratio toward
+    # +/-infinity and corrupts the average, even though the underlying
+    # simulation is fine. Confirmed this the hard way: an earlier version
+    # of this exact formula produced a "-9,313,725,683% harm reduction"
+    # line on real reddit data. The paired t-test below is unaffected
+    # either way since it operates on the raw bounded AUC-R values.
+    reduction_pct = (base_auc.mean() - rapo_auc.mean()) / base_auc.mean() * 100
+    print(f"Reduction in mean AUC-R: {reduction_pct:.2f}%")
     t = stats.ttest_rel(base_auc, rapo_auc)
     print(f"Paired t-test: t = {t.statistic:.4f}, p = {t.pvalue:.6g}")

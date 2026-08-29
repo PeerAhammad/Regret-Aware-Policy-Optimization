@@ -1,0 +1,49 @@
+{
+  "rows": [
+    {
+      "lam": 0.05,
+      "t_emerge": 129,
+      "one_over_lambda": 20.0,
+      "asymptotic_gap": 84.96366389099173
+    },
+    {
+      "lam": 0.075,
+      "t_emerge": 109,
+      "one_over_lambda": 13.333333333333334,
+      "asymptotic_gap": 55.64244259399476
+    },
+    {
+      "lam": 0.1,
+      "t_emerge": 102,
+      "one_over_lambda": 10.0,
+      "asymptotic_gap": 40.98183194549609
+    },
+    {
+      "lam": 0.15,
+      "t_emerge": 96,
+      "one_over_lambda": 6.666666666666667,
+      "asymptotic_gap": 26.321221296997393
+    },
+    {
+      "lam": 0.2,
+      "t_emerge": 94,
+      "one_over_lambda": 5.0,
+      "asymptotic_gap": 18.990915972748063
+    },
+    {
+      "lam": 0.3,
+      "t_emerge": 91,
+      "one_over_lambda": 3.3333333333333335,
+      "asymptotic_gap": 11.660610648498713
+    },
+    {
+      "lam": 0.4,
+      "t_emerge": 90,
+      "one_over_lambda": 2.5,
+      "asymptotic_gap": 7.995457986374038
+    }
+  ],
+  "fit_slope": 2.173423044575276,
+  "fit_intercept": 82.6833473507149,
+  "pearson_r": 0.9879642029373479
+}

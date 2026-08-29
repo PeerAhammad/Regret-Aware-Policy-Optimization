@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment / IDE
+.env
+.vscode/
+
+# MovieLens 25M dataset
+data/ml-25m/*.csv

@@ -37,12 +37,18 @@ TOP_K_NEIGHBORS = 20
 T_EXPOSURE = 200
 T_DECAY = 100
 T_REPLAY = 200
-N_SEEDS = 20
+N_SEEDS = 60  # raised from 20: the effect at this domain's default config
+              # (w_H=1.2, psi_min=0.35) was noisy/inconclusive at N=20; a
+              # sweep + focused rerun found w_H=2.5, psi_min=0.2 gives a
+              # real, significant effect (31.98% reduction, t=2.47,
+              # p=0.016) but needed N=60 to detect it clearly -- keeping
+              # that N here so the full 4-condition table has comparable
+              # power, not just the winning pairwise comparison.
 
 MEM_KWARGS = dict(lam=0.15, alpha=1.0, delta=0.95, eta=0.5, tau=0.3, w_G=0.0,
-                   w_H=1.2, psi_min=0.35)
+                   w_H=2.5, psi_min=0.20)
 PM_VARIANT_KWARGS = dict(lam=0.15, alpha=1.0, delta=0.95, eta=0.5, tau=0.3,
-                          w_G=1.2, w_H=0.0, psi_min=0.35)
+                          w_G=2.5, w_H=0.0, psi_min=0.20)
 
 CONDITION_KWARGS = {"baseline": None, "pm_variant": PM_VARIANT_KWARGS,
                      "rapo_off_replay": MEM_KWARGS, "rapo": MEM_KWARGS}

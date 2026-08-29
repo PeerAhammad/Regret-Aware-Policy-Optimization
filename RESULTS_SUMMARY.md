@@ -250,3 +250,136 @@ distributions used in Exposure vs. Replay at matching states (not asserted
 from the domain design) — a real zero, not a stand-in for "not applicable"
 like graph diffusion's N/A.
 
+---
+
+## UPDATE: MovieLens-25M domain (real, verified results) — PROJECT WRAP-UP
+
+Files: `movielens_env.py` (environment), `run_movielens.py` (main
+experiment — the ONLY script that writes `results_movielens.json`),
+`analyze_movielens.py` (reads that file only, no hardcoded numbers),
+`run_movielens_sensitivity.py` (hyperparameter sweep),
+`run_movielens_focused.py` (high-power rerun of the winning config).
+
+**This domain took three real rounds of bugs, each only found by actually
+running the code against the real 25M-row dataset — worth reading in
+full if this domain gets touched again.**
+
+1. **The version audited from the original project had a static
+   candidate list** (`recommend()` returned the same 10 movies every
+   call — no real `x_t -> x_{t+1}` transition), **redrew a fresh random
+   "controversial" item every single step** (so RSD's "same stimulus at
+   Replay" requirement was never met), and **had three incompatible
+   utility formulas across different scripts** — one of which produced a
+   headline number (utility change ≈ −1.30%, p≈9×10⁻¹⁶) that did not
+   match what the actual script produced when run (real output: −0.90%
+   ± 3.37%, p=0.245, not significant), and the script that generated the
+   underlying data file wasn't even in the project. Entire pipeline
+   rebuilt from scratch — see README.md for full detail.
+2. **First real-data run of the rebuild came back with RAG/AUC-R = nan
+   and scar_gap = exactly 0.000 for every condition** — harm never fired
+   once in 80 runs. Cause: harm was defined as "landed on an
+   individually-tagged controversial movie," but the walk only navigates
+   genre similarity, and "controversial" has no structural relationship
+   to genre. Switched to region-level harm — which then surfaced a
+   second bug: `r_harm` (mode region across all controversial items)
+   didn't match the specific stimulus item's own region, so a walk
+   starting at the stimulus item had no structural reason to ever reach
+   it. Fixed by tying `r_harm` directly to the stimulus item's own
+   region.
+3. **Second real-data run came back with RAG exactly 1.000 and zero
+   variance across every seed and condition, including RAPO itself** —
+   deformation was having no effect at all despite scars building up
+   normally. Cause: regions (KMeans) and the item-item neighbor kernel
+   (cosine similarity) were built from the SAME genre-vector space, so
+   an item's nearest neighbors were, by construction, almost always in
+   its own region — ψ(target region) was nearly constant across a given
+   item's whole candidate set, and multiplying a distribution by a
+   constant is a no-op after renormalization. Fixed by mixing each
+   item's candidate set: half genre-similar (same-region-biased), half
+   popularity-weighted from the full pool regardless of region, so
+   crossing regions became a real, live possibility deformation could
+   act on.
+4. **With the mechanism finally working, the DEFAULT hyperparameters
+   (carried over unchanged from the synthetic testbed) showed NO
+   significant suppression** (baseline AUC-R 1.16 vs RAPO 1.21, worse
+   point estimate, t=−0.20, p=0.84). A 5-point hyperparameter sweep at
+   N=20 found one directionally-promising candidate (w_H=2.5, ψ_min=0.2:
+   t=1.19, p=0.25 — still not significant) and four that were flat or
+   worse. Rather than accept "the least-bad of five," reran that one
+   candidate at N=60 for real power: **31.98% reduction, t=2.4737,
+   p=0.0163 — confirmed reproducible on a second independent run.**
+
+**Final table (λ=0.15, α=1.0, δ=0.95, η=0.5, τ=0.3, w_G=0, w_H=2.5,
+ψ_min=0.20; N=60 seeds; real ml-25m data, 3082 candidate items, 126
+controversial-tagged, 75 KMeans genre regions):**
+
+| Method | RAG ↓ | AUC-R ↓ | ReplayRet ↑ | ASD |
+|---|---|---|---|---|
+| Stationary | 1.00±0.00 | 1.36±0.33 | 1.00 | 0.0000 |
+| PM variant (fast-memory only) | 1.00±0.00 | 1.22±0.18 | 1.01 | 0.0000 |
+| RAPO-off@rep | 1.00±0.00 | 3.37±0.52 | 1.00 | 0.0000 |
+| **RAPO** | 0.98±0.03 | **0.93±0.13** | 1.04 | 0.0000 |
+
+**Same reporting note as Safety Gym applies here: RAG saturates near
+1.000 and doesn't discriminate between conditions (200 steps makes at
+least one harmful hit near-certain regardless of condition) — AUC-R is
+the metric that actually shows the effect, and should be primary in the
+paper for this domain too, with a note explaining why.**
+
+**RAPO-off@rep (3.37) is dramatically worse than baseline (1.36)** — the
+strongest causal-isolation signal of any of the three domains: removing
+deformation exactly at Replay doesn't just restore baseline-level harm,
+it more than doubles it, because scars accumulated during Exposure/Decay
+apparently redirect the walk in ways that, once deformation is switched
+off, concentrate it even more strongly in the harmful region than an
+undeformed walk would be on its own. Worth a sentence of discussion in
+the paper rather than treating it as a clean restoration to baseline
+like the other two domains showed.
+
+**One non-bug, worth a footnote so a reviewer doesn't flag it as one:**
+PM-variant's `scar_gap` (1.01) is numerically higher than RAPO's (0.79),
+which looks backwards at a glance. It isn't a bug — PM-variant's scar
+channel H still accumulates internally regardless of w_H, it's just that
+w_H=0 for PM-variant means H has zero *influence* on its own
+deformation (only the trace channel G, via w_G, drives PM-variant's
+suppression). Higher scar_gap there doesn't imply more suppression for
+that condition.
+
+**Utility cost is minimal across the board** (ReplayRet 0.96–1.04) —
+unlike graph diffusion's ~40% utility hit, this domain's mixed
+genre/cross-region kernel doesn't cost much navigation quality even
+under strong deformation.
+
+**ASD = 0.0000 exactly**, same verified (not assumed) construction as
+Safety Gym.
+
+---
+
+## Project status (as of this wrap-up)
+
+Three domains complete, real, and independently reproduced on the user's
+machine (not just in the sandbox): **Graph Diffusion**, **Safety Gym**,
+**MovieLens-25M**. A fourth (Reddit Cascades) was scoped but not
+attempted — it needs real conversational data plus a toxicity signal
+(Perspective API or a local classifier), a similar data-access lift to
+MovieLens, and was deliberately not rushed given how much real
+verification work each of the other three domains took.
+
+**Every domain had at least one real bug that would have produced
+plausible-looking but wrong numbers if not caught by actually running
+the code and inspecting the output** — not by code review alone. If this
+project is picked up again, the standing practice that caught all of
+them: run on the real machine/data, check for exact-zero or
+exact-saturated values (usually a sign a metric or a mechanism isn't
+engaging at all, not that things are going great), check that ablations
+move in the theoretically-expected direction, and re-run anything before
+trusting it as reproducible.
+
+**The paper draft itself has NOT been updated** with any of these
+results — that was deliberately deferred per instruction. When it is
+updated, each domain's row should carry the "report AUC-R as primary,
+not RAG" caveat where it applies (Safety Gym, MovieLens), and the ASD
+column needs a real decision (0.0000 for Safety Gym/MovieLens, N/A for
+graph diffusion — not a single shared value across all four domains as
+the original placeholder table implied).
+

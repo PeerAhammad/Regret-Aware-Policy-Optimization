@@ -13,3 +13,6 @@ env/
 
 # MovieLens 25M dataset
 data/ml-25m/*.csv
+
+# Reddit corpus dataset
+reddit-corpus-small.corpus.zip

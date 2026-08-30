@@ -1,0 +1,105 @@
+{
+  "baseline_AUC_R_mean": NaN,
+  "sweep": [
+    {
+      "cfg": {
+        "lam": 0.15,
+        "alpha": 1.0,
+        "delta": 0.95,
+        "eta": 0.5,
+        "tau": 0.3,
+        "w_G": 0.0,
+        "w_H": 2.5,
+        "psi_min": 0.2
+      },
+      "rapo_AUC_R_mean": NaN,
+      "reduction_pct": -98.51455356501623,
+      "t_stat": -1.9257382983906828,
+      "p_value": 0.06658731633755421,
+      "rapo_rep_harm_mean": 2.466666666666667,
+      "abs_reduction_pct": 48.25174825174825,
+      "t_stat_abs": 2.825941404276819,
+      "p_value_abs": 0.008448118897727718
+    },
+    {
+      "cfg": {
+        "lam": 0.15,
+        "alpha": 1.0,
+        "delta": 0.95,
+        "eta": 0.5,
+        "tau": 0.3,
+        "w_G": 0.0,
+        "w_H": 4.0,
+        "psi_min": 0.1
+      },
+      "rapo_AUC_R_mean": NaN,
+      "reduction_pct": -105.95375398095372,
+      "t_stat": -1.8723820889087346,
+      "p_value": 0.07392261899778986,
+      "rapo_rep_harm_mean": 1.8333333333333333,
+      "abs_reduction_pct": 61.53846153846154,
+      "t_stat_abs": 3.5150581507020466,
+      "p_value_abs": 0.001465252302308575
+    },
+    {
+      "cfg": {
+        "lam": 0.15,
+        "alpha": 1.0,
+        "delta": 0.95,
+        "eta": 0.5,
+        "tau": 0.3,
+        "w_G": 0.0,
+        "w_H": 6.0,
+        "psi_min": 0.05
+      },
+      "rapo_AUC_R_mean": NaN,
+      "reduction_pct": -85.98001039843662,
+      "t_stat": -2.212602829119959,
+      "p_value": 0.03712733712058823,
+      "rapo_rep_harm_mean": 1.8333333333333333,
+      "abs_reduction_pct": 61.53846153846154,
+      "t_stat_abs": 3.7168482118484825,
+      "p_value_abs": 0.000857996004217897
+    },
+    {
+      "cfg": {
+        "lam": 0.1,
+        "alpha": 1.0,
+        "delta": 0.97,
+        "eta": 0.7,
+        "tau": 0.2,
+        "w_G": 0.0,
+        "w_H": 6.0,
+        "psi_min": 0.05
+      },
+      "rapo_AUC_R_mean": NaN,
+      "reduction_pct": -77.31792772234508,
+      "t_stat": -2.522006320237117,
+      "p_value": 0.019045244422027433,
+      "rapo_rep_harm_mean": 1.3666666666666667,
+      "abs_reduction_pct": 71.32867132867132,
+      "t_stat_abs": 4.367680306465215,
+      "p_value_abs": 0.00014627314641588225
+    },
+    {
+      "cfg": {
+        "lam": 0.2,
+        "alpha": 1.0,
+        "delta": 0.93,
+        "eta": 0.4,
+        "tau": 0.4,
+        "w_G": 0.0,
+        "w_H": 3.5,
+        "psi_min": 0.15
+      },
+      "rapo_AUC_R_mean": NaN,
+      "reduction_pct": -70.45619948481372,
+      "t_stat": -1.7832070205318094,
+      "p_value": 0.08775654560324224,
+      "rapo_rep_harm_mean": 2.533333333333333,
+      "abs_reduction_pct": 46.85314685314685,
+      "t_stat_abs": 2.780288502390133,
+      "p_value_abs": 0.009438800391481544
+    }
+  ]
+}

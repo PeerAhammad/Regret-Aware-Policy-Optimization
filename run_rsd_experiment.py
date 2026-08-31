@@ -1,20 +1,3 @@
-"""
-Runs the Replay Suppression Diagnostic (RSD) on the synthetic RegionEnv
-using EXACT mean-field dynamics (the region probability distribution is
-evolved deterministically each step; no Monte Carlo noise). This is valid
-here because harm and attribution are both concentrated on a single region
-r_H, so the expected trace/scar update has closed form and matches the
-mean of the stochastic single-trajectory process exactly.
-
-Conditions:
-  1. baseline          -> psi == 1 always                 (tests Theorem 1)
-  2. rapo               -> deformation on throughout        (main result)
-  3. rapo_off_replay    -> deformation on except in Replay  (causal ablation)
-
-All numbers are exact simulation outputs given the stated hyperparameters
-(MEM_KWARGS below) — none are placeholders.
-"""
-
 import json
 import numpy as np
 from rapo_core import RegionEnv, TraceScarMemory, run_meanfield
@@ -56,9 +39,6 @@ def run_condition(condition):
 
     replay_deform = {"baseline": False, "rapo": True, "rapo_off_replay": False}[condition]
 
-    # single-step odds check (Lemma 1 is a single-decision statement at a
-    # FIXED scar gap; averaging over the whole replay window confounds it
-    # with the scars continuing to evolve during replay itself)
     p0_row_at_xstar = env.base_kernel_row(x_star, stimulus_on=True)
     p0_single_step = p0_row_at_xstar[R_HARM]
     if memory is not None and replay_deform:
@@ -68,6 +48,7 @@ def run_condition(condition):
         p_single_step = deformed_row[R_HARM]
     else:
         p_single_step = p0_single_step
+
     ps_rep, harm_rep = run_meanfield(env, memory, T_REPLAY, stimulus_on=True,
                                       p0_dist=delta_dist(N_REGIONS, x_star),
                                       apply_deformation=replay_deform)
@@ -94,7 +75,7 @@ def odds(p):
 def main():
     results = {c: run_condition(c) for c in ["baseline", "rapo", "rapo_off_replay"]}
 
-    p0_replay_mean = results["baseline"]["mean_reach_replay"]  # undeformed reference
+    p0_replay_mean = results["baseline"]["mean_reach_replay"]
     for c, r in results.items():
         r["odds_ratio_vs_undeformed"] = odds(r["mean_reach_replay"]) / odds(p0_replay_mean)
 

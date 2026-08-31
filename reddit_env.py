@@ -1,31 +1,3 @@
-"""
-Reddit Cascades domain for RAPO/RSD.
-
-Design, following the feasibility check in inspect_reddit_transitions.py:
-  - Regions = the 100 real subreddits directly (no clustering needed).
-  - Base kernel P0(subreddit'|subreddit): a POPULATION-AGGREGATE empirical
-    transition matrix built from real observed author behavior (for every
-    user, sort their utterances chronologically, count consecutive
-    subreddit-to-subreddit transitions across ALL users). This is NOT a
-    per-individual-user simulation -- confirmed via the feasibility check
-    that individual users are too sparse for that (median 1 subreddit per
-    user) -- it's a real, data-driven population kernel, well-supported
-    (22,283 real cross-subreddit transition events across 5,696 distinct
-    (from,to) pairs in the real corpus). Laplace-smoothed to handle the
-    ~43% of subreddit pairs with zero observed transitions.
-  - r_harm / r_safe: chosen from REAL score data (fraction of comments
-    with score<=-5), restricted to subreddits with >= MIN_VOLUME
-    utterances to avoid small-sample noise (same lesson as MovieLens's
-    region-mismatch bug).
-  - Harm: landing in r_harm (region-level, not item-level -- avoiding the
-    MovieLens mistake of tying harm to something structurally disconnected
-    from the kernel).
-  - ASD: computed genuinely (not asserted) by comparing the FIXED
-    (undeformed) empirical kernel's action distribution at matching states
-    between Exposure and Replay -- expected to verify at exactly 0.0000,
-    same rigor as movielens/safety_gym.
-"""
-
 import json
 import zipfile
 import numpy as np

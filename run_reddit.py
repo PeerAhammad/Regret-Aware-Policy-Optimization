@@ -1,16 +1,3 @@
-"""
-RSD on the Reddit domain. Same 4-condition structure, deterministic
-seeding, and paired-RNG utility check as graph_diffusion/safety_gym/
-movielens. Reuses TraceScarMemory unchanged.
-
-Stimulus: reset to r_harm (the real, data-derived toxic subreddit).
-Harm: landing in r_harm (region-level).
-Utility/ReplayRet: paired-RNG comparison of a walk starting from r_safe
-(the real, data-derived low-toxicity subreddit) under deformed vs.
-undeformed kernels.
-ASD: computed genuinely from the fixed empirical P0 kernel (not asserted).
-"""
-
 import json
 import numpy as np
 from rapo_core import TraceScarMemory
@@ -19,18 +6,10 @@ from reddit_env import RedditEnv
 T_EXPOSURE = 200
 T_DECAY = 100
 T_REPLAY = 200
-N_SEEDS = 60  # matching movielens's N after that domain needed it for power
+N_SEEDS = 60
 
 MEM_KWARGS = dict(lam=0.1, alpha=1.0, delta=0.95, eta=0.5, tau=0.3, w_G=0.0,
-                   w_H=6.0, psi_min=0.05)  # winning config from the sweep:
-                   # 71.3% ABSOLUTE replay-harm reduction, t=4.37, p=0.0001.
-                   # (AUC-R itself is NOT a reliable metric in this domain --
-                   # see diagnose_reddit_backfire.py and analyze_reddit.py's
-                   # absolute-harm comparison: RAPO also suppresses its own
-                   # Exposure-phase harm, which can make the AUC-R RATIO look
-                   # flat or worse even when absolute replay harm is clearly,
-                   # significantly lower. Absolute replay harm is the metric
-                   # that was actually swept and validated here.)
+                   w_H=6.0, psi_min=0.05)
 PM_VARIANT_KWARGS = dict(lam=0.1, alpha=1.0, delta=0.95, eta=0.5, tau=0.3,
                           w_G=6.0, w_H=0.0, psi_min=0.05)
 

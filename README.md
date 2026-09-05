@@ -1,7 +1,5 @@
 # RAPO: Replay-Aware Policy Optimization under Replay-Specific Deformation
 
-Anonymous code repository accompanying the paper submitted to ICLR.
-
 This repository contains the implementations, experimental pipelines, analysis
 scripts, plotting code, and figures used to evaluate **Replay-Aware Policy
 Optimization (RAPO)** under **Replay-Specific Deformation (RSD)**.
